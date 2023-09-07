@@ -1,0 +1,26 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  lint:
+    name: 💅 Lint code
+    runs-on: ubuntu-latest
+    env:
+      GO_VERSION: '1.21'
+      GOLANGCI_LINT_VERSION: v1.54
+    steps:
+      - name: ✅ Checkout code
+        uses: actions/checkout@v3
+      - name: 🛠️ Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: 🚀 Run linter
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: ${{ env.GOLANGCI_LINT_VERSION }}
