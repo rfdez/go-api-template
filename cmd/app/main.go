@@ -66,7 +66,7 @@ func main() {
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown: ", err)
+		log.Panic("Server forced to shutdown: ", err)
 	}
 
 	log.Println("Server exiting...")
