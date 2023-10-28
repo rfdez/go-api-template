@@ -16,7 +16,8 @@ import (
 )
 
 const (
-	ServerAddress = ":8080"
+	ServerAddress         string        = ":8080"
+	ServerShutdownTimeout time.Duration = 5 * time.Second
 )
 
 func main() {
@@ -41,29 +42,32 @@ func main() {
 	router.GET("/health", handlers.Health())
 
 	srv := &http.Server{
-		Addr:    ServerAddress,
-		Handler: router,
+		Addr:         ServerAddress,
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+		Handler:      router,
 	}
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("listen: %s\n", err)
+			log.Fatal("Server failed to start: ", err)
 		}
 	}()
 
-	log.Printf("Server listening on %s\n", ServerAddress)
+	log.Printf("Server listening on %s...", ServerAddress)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-quit
 	log.Println("Shutting down server...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ServerShutdownTimeout)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Panic("Server forced to shutdown: ", err)
+		log.Fatal("Server forced to shutdown: ", err)
 	}
 
-	log.Println("Server exiting")
+	log.Println("Server exiting...")
 }
