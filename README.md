@@ -12,21 +12,22 @@ In this repository you will find a template for creating a Go backend project. I
 - [Golangci-lint](https://golangci-lint.run/) as linter and formatter
 - [Docker](https://www.docker.com/) as containerization tool
 - [Github Actions](https://github.com/features/actions) for CI (Continuous Integration)
+- [Taskfile](https://taskfile.dev) for task automation
 
 ## 🚀 Getting Started
 
 ```shell
 # Install dependencies
-go mod download
+task deps
 
 # Run the application
-go run cmd/app/main.go
+task run
 
 # Build the application
-CGO_ENABLED=0 go build -a --trimpath --ldflags="-s -w" -o ./bin/app ./cmd/app/main.go
+task build
 
 # Run the application with the binary
-./bin/app
+task start
 ```
 
 ## 🐳 Docker
@@ -43,15 +44,15 @@ docker run --rm -p 8080:8080 <owner>/go-api-template:<tag>
 
 ```shell
 # Run tests
-go test -race -parallel 2 -cover ./...
+task test
 ```
 
 ## 💅 Linting
 
 ```shell
 # Run linter (if you have golangci-lint installed)
-golangci-lint run
+task lint
 
 # Run linter (with docker)
-docker run -t --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.54.2 golangci-lint run
+task lint:docker
 ```

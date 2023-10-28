@@ -1,0 +1,31 @@
+version: '3'
+
+tasks:
+  default:
+    cmds:
+      - task: deps
+      - task: run
+  deps:
+    cmds:
+      - go mod tidy
+  run:
+    cmds:
+      - go run cmd/app/main.go
+  build:
+    cmds:
+      - CGO_ENABLED=0 go build -a --trimpath --ldflags="-s -w" -o ./bin/app ./cmd/app/main.go
+  start:
+    deps: [build]
+    preconditions:
+      - test -f ./bin/app
+    cmds:
+      - ./bin/app
+  test:
+    cmds:
+      - go test -race -parallel 2 -cover ./...
+  lint:
+    cmds:
+      - golangci-lint run
+  lint:docker:
+    cmds:
+      - docker run -t --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.54.2 golangci-lint run
